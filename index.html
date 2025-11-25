@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+input {
+padding: 12px;
+width: 100%;
+border: 1px solid #ccc;
+border-radius: 8px;
+margin-top: 12px;
+font-size: 15px;
+}
+button {
+padding: 12px;
+width: 100%;
+margin-top: 15px;
+background: #0078ff;
+border: none;
+color: white;
+font-size: 16px;
+border-radius: 8px;
+cursor: pointer;
+transition: 0.2s;
+}
+button:hover {
+background: #005fcc;
+}
+#uploadBox { display: none; }
+#status { margin-top: 10px; color: #0078ff; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="card">
+<h2>Login Akses</h2>
+<input type="password" id="pw" placeholder="Masukkan Password">
+<button onclick="login()">Masuk</button>
+
+
+<div id="uploadBox">
+<h2>Upload File</h2>
+<input type="file" id="fileInput">
+<button onclick="uploadFile()">Upload ke GitHub</button>
+<p id="status"></p>
+</div>
+</div>
+
+
+<script>
+const PASSWORD = "12345"; // Ganti password sesuai kebutuhan
+
+
+function login() {
+const pw = document.getElementById("pw").value;
+if (pw === PASSWORD) {
+document.getElementById("uploadBox").style.display = "block";
+alert("Login berhasil!");
+} else {
+alert("Password salah!");
+}
+}
+
+
+async function uploadFile() {
+const fileInput = document.getElementById("fileInput");
+const file = fileInput.files[0];
+if (!file) return alert("Pilih file dulu!");
+
+
+const arrayBuffer = await file.arrayBuffer();
+const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+
+
+const res = await fetch("/api/upload", {
+method: "POST",
+headers: { "Content-Type": "application/json" },
+body: JSON.stringify({ filename: file.name, content: base64 })
+});
+
+
+const data = await res.json();
+document.getElementById("status").innerText = data.message;
+}
+</script>
+</body>
+</html>
